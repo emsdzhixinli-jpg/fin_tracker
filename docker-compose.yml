@@ -1,7 +1,7 @@
 services:
   kafka:
     image: confluentinc/cp-kafka:8.0.7
-    pull_policy: never # Can remove accordingly
+    # pull_policy: never # Can remove accordingly
     hostname: kafka
     ports:
       - "9092:9092"
@@ -25,7 +25,7 @@ services:
 
   kafka-init:
     image: confluentinc/cp-kafka:8.0.7
-    pull_policy: never # Can remove accordingly
+    # pull_policy: never # Can remove accordingly
     depends_on:
       kafka:
         condition: service_healthy
