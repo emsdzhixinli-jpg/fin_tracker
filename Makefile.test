@@ -1,0 +1,54 @@
+# Test targets for FinTransTracker.
+#
+# Usage:
+#   make -f Makefile.test unit
+#   make -f Makefile.test integration   # needs Kafka (make kafka)
+#   make -f Makefile.test all
+#
+# How unit vs integration is separated today:
+#   unit         — tests/*.py that mock Kafka / exercise pure logic
+#   integration  — tests/integration/ (real broker; add test_*.py there later)
+#
+# Longer-term tip: mark tests with
+#   @pytest.mark.unit
+#   @pytest.mark.integration
+# and filter with: pytest -m unit  /  pytest -m integration
+
+PYTHON ?= ./venv/bin/python
+export PYTHONPATH := src
+
+ifneq (,$(wildcard .env))
+include .env
+export
+endif
+
+KAFKA_BOOTSTRAP_SERVERS ?= localhost:9092
+export KAFKA_BOOTSTRAP_SERVERS
+
+UNIT_TESTS := \
+	tests/test_process_transactions.py \
+	tests/test_producer.py \
+	tests/test_consumer.py
+
+INTEGRATION_DIR := tests/integration
+
+.PHONY: help unit integration all
+
+help:
+	@echo "make -f Makefile.test unit         - unit tests (no Kafka required)"
+	@echo "make -f Makefile.test integration  - integration tests (run make kafka first)"
+	@echo "make -f Makefile.test all          - unit then integration"
+
+unit:
+	$(PYTHON) -m pytest $(UNIT_TESTS) -q
+
+integration:
+	@mkdir -p $(INTEGRATION_DIR); \
+	if ! ls $(INTEGRATION_DIR)/test_*.py >/dev/null 2>&1; then \
+		echo "No integration tests under $(INTEGRATION_DIR)/ yet."; \
+	else \
+		echo "Expect Kafka at $(KAFKA_BOOTSTRAP_SERVERS) (run: make kafka)"; \
+		$(PYTHON) -m pytest $(INTEGRATION_DIR) -m integration -q; \
+	fi
+
+all: unit integration

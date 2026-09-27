@@ -1,0 +1,6 @@
+# CI override: allow pulling Kafka images (local compose uses pull_policy: never).
+services:
+  kafka:
+    pull_policy: always
+  kafka-init:
+    pull_policy: always

@@ -1,0 +1,73 @@
+# Run unit tests on every push/PR; integration tests against a real Kafka broker.
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  PYTHONPATH: src
+  KAFKA_BOOTSTRAP_SERVERS: localhost:9092
+
+jobs:
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: make -f Makefile.test unit PYTHON=python
+
+  integration:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    needs: unit
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Start Kafka and create topics
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d kafka kafka-init
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml wait kafka-init
+
+      - name: Ensure shared config file exists
+        run: |
+          mkdir -p data
+          test -f data/simulation_config.json || cat > data/simulation_config.json <<'EOF'
+          {
+            "start_datetime": "2026-08-01T00:00:00",
+            "end_datetime": "2026-08-31T00:00:00",
+            "transaction_types": ["deposit", "transfer"],
+            "aggregation_methods": ["sum"],
+            "filter_rules": null
+          }
+          EOF
+
+      - name: Run integration tests
+        run: make -f Makefile.test integration PYTHON=python
+
+      - name: Stop Kafka
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml down -v

@@ -1,0 +1,7 @@
+confluent_kafka
+numpy
+pyyaml
+pandas
+pydantic
+pytest
+python-dotenv

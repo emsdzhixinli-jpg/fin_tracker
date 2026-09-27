@@ -1,0 +1,2 @@
+# Place real-Kafka / end-to-end tests here (e.g. test_kafka_roundtrip.py).
+# Run with: make -f Makefile.test integration

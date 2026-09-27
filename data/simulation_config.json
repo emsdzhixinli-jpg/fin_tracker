@@ -1,0 +1,28 @@
+{
+    "start_datetime": "2026-08-15T00:00:00",
+    "end_datetime": "2026-08-30T10:18:00",
+    "transaction_types": [
+        "income",
+        "expense",
+        "transfer"
+    ],
+    "aggregation_methods": [
+        "max",
+        "min"
+    ],
+    "filter_rules": [
+        "and",
+        [
+            [
+                "expense",
+                ">=",
+                1000.0
+            ],
+            [
+                "expense",
+                "<",
+                3000.0
+            ]
+        ]
+    ]
+}

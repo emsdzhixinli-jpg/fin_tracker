@@ -1,0 +1,9 @@
+# Producer service: publish transaction notices, listen for config reloads.
+# bootstrap.servers comes from KAFKA_BOOTSTRAP_SERVERS (.env / Compose / Makefile).
+client.id: fintrans-producer
+group.id: fintrans-producer-config
+auto.offset.reset: earliest
+enable.auto.commit: true
+topics:
+  produce: transactions
+  consume: config_sync

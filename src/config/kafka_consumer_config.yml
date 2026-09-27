@@ -1,0 +1,9 @@
+# Consumer service: publish config reloads, listen for transaction notices.
+# bootstrap.servers comes from KAFKA_BOOTSTRAP_SERVERS (.env / Compose / Makefile).
+client.id: fintrans-consumer
+group.id: fintrans-consumer-transactions
+auto.offset.reset: earliest
+enable.auto.commit: true
+topics:
+  produce: config_sync
+  consume: transactions
