@@ -49,21 +49,23 @@ jobs:
 
       - name: Start Kafka and create topics
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d kafka kafka-init
-          docker compose -f docker-compose.yml -f docker-compose.ci.yml wait kafka-init
+          COMPOSE="docker compose -f docker-compose.yml -f docker-compose.ci.yml"
+          $COMPOSE up -d --wait kafka
+          $COMPOSE run --rm kafka-init
 
       - name: Ensure shared config file exists
         run: |
           mkdir -p data
-          test -f data/simulation_config.json || cat > data/simulation_config.json <<'EOF'
-          {
-            "start_datetime": "2026-08-01T00:00:00",
-            "end_datetime": "2026-08-31T00:00:00",
-            "transaction_types": ["deposit", "transfer"],
-            "aggregation_methods": ["sum"],
-            "filter_rules": null
-          }
-          EOF
+          if [ ! -f data/simulation_config.json ]; then
+            printf '%s\n' \
+              '{' \
+              '  "start_datetime": "2026-08-01T00:00:00",' \
+              '  "end_datetime": "2026-08-31T00:00:00",' \
+              '  "transaction_types": ["deposit", "transfer"],' \
+              '  "aggregation_methods": ["sum"],' \
+              '  "filter_rules": null' \
+              '}' > data/simulation_config.json
+          fi
 
       - name: Run integration tests
         run: make -f Makefile.test integration PYTHON=python
