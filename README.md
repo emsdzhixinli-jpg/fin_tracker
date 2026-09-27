@@ -95,6 +95,8 @@ You will be prompted for the **initial configuration** (see [Expected input](#ex
 
 ### Run tests
 
+Auto test using Git Action is set up. But you can feel free to do local tests using the following commands.
+
 Tests use `Makefile.test` and the same `venv` / `PYTHONPATH=src` as the app. From the project root:
 
 
@@ -185,7 +187,7 @@ Same as above for **date range**, **aggregation methods**, and **filter rules**.
 
 ### Aggregation report
 
-After producer startup or after a successful consumer config modify, you see bordered tables per aggregation method. Example from a run with date range `2026-08-01`–`2026-08-31`, methods `sum,max,min`, and filter `income:>=:300;income:<:6800` (amounts vary by seed and live publishes):
+After producer startup or after a successful consumer config modify, you see bordered tables per aggregation method. Example from a run with date range `2026-08-01` to `2026-08-31`, methods `sum,max,min`, and filter `income:>=:300;income:<:6800` (amounts vary by seed and live publishes):
 
 ```text
 The sum of the transactions between 2026-08-01 00:00:00 and 2026-08-31 00:00:00 are as follows, with filter rules (income:>=:300.0 and income:<:6800.0):
@@ -195,7 +197,6 @@ The sum of the transactions between 2026-08-01 00:00:00 and 2026-08-31 00:00:00 
 | income             | +            | 9208.326164757958  | 2                      |
 | income             | -            | 6176.3919972178965 | 1                      |
 -----------------------------------------------------------------------------------
-
 The max of the transactions between 2026-08-01 00:00:00 and 2026-08-31 00:00:00 are as follows, with filter rules (income:>=:300.0 and income:<:6800.0):
 -----------------------------------------------------------------------------------
 | Transaction Type   | Directions   | Amount             | Counterparties Count   ||
@@ -203,7 +204,6 @@ The max of the transactions between 2026-08-01 00:00:00 and 2026-08-31 00:00:00 
 | income             | +            | 5330.969527065925  | 2                      |
 | income             | -            | 6176.3919972178965 | 1                      |
 -----------------------------------------------------------------------------------
-
 The min of the transactions between 2026-08-01 00:00:00 and 2026-08-31 00:00:00 are as follows, with filter rules (income:>=:300.0 and income:<:6800.0):
 -----------------------------------------------------------------------------------
 | Transaction Type   | Directions   | Amount             | Counterparties Count   ||
@@ -235,7 +235,9 @@ A plain-text table of columns: `transaction_datetime`, `transaction_type`, `coun
 
 ## Test examples
 
-Values below are **illustrative**. Amounts and row counts depend on the random seed and live publishes—**adjust dates and filter thresholds to match your actual simulated data. You can use it to test the CLI tool.**
+Values below are **illustrative**. Amounts and row counts depend on the random seed and live publishes—adjust dates and filter thresholds to match your actual simulated data.
+
+**You can use it to test the CLI tool.**
 
 ### Example 1 — Initial setup (producer)
 
@@ -355,6 +357,8 @@ This mimics real-time monitoring of new financial events.
 3. The **consumer** rebuilds a DataFrame, prints the table, then flushes any queued notices.
 
 Request and reply use the same `request_id` so concurrent prompts do not cross wires.
+
+![FinTransTracker data flow](docs/fintrans-kafka-system-structure.png)
 
 ---
 
